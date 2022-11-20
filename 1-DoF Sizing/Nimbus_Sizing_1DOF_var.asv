@@ -12,7 +12,7 @@ R = 287;            % think its called the gas constant right !? it's late and i
 
 % Engine Parameters
 OF = 3;                         % OF ratio
-m0_ox = 7;                      % oxidizer mass of rocket, kg
+m0_ox = 6;                      % oxidizer mass of rocket, kg
 m0_fuel = m0_ox/OF;             % fuel mass of rocket, kg
 m_propellant = m0_fuel + m0_ox; % total propellant mass, kg
 
@@ -29,7 +29,7 @@ A_e = pi*(D_e/2000)^2; % nozzle exit area
 
 % Rocket Parameters
 m_dry = 35:1:55;  % dry mass of rocket, kg
-Cd = 0.6;        % drag coefficient (neglecting supersonic drag for now cus i dont think we are going this fast (but now we are ffs !!))
+Cd = 0.80;        % drag coefficient (neglecting supersonic drag for now cus i dont think we are going this fast (but now we are ffs !!))
 D = 0.19;         % rocket diameter in m
 A = (pi*D^2)/4;   % cross sectional area of rocket, m^2
 
