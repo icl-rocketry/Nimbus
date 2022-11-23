@@ -11,7 +11,7 @@ p0 = 101325;        % sea level pressure (Pa)
 R = 287;            % think its called the gas constant right !? it's late and i don't remember
 
 % Engine Parameters
-OF = 3;                         % OF ratio
+OF = 3.5;                         % OF ratio
 m0_ox = 7;                      % oxidizer mass of rocket, kg
 m0_fuel = m0_ox/OF;             % fuel mass of rocket, kg
 m_propellant = m0_fuel + m0_ox; % total propellant mass, kg
