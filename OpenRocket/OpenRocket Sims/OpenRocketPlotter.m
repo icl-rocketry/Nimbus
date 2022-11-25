@@ -17,7 +17,7 @@ clear; clc; close all
 % UNSELECT all comments (simulation descriptions, field descriptions and
 % flight events)
 
-filename = 'frr6.csv';
+filename = 'CDR_data.csv';
 data = readtable(filename);
 
 % u may need to chnage variable names here cus im stupid and made some
@@ -30,17 +30,17 @@ data.Properties.VariableNames = {'time','altitude','vert_vel','vert_acc','tot_ve
     'normal_force_coeff','pitch_moment_coeff','yaw_moment_coeff','side_force_coeff',...
     'roll_moment_coeff','roll_forcing_coeff','roll_damping_coeff','pitch_damping_coeff',...
     'coriolis_coeff','ref_length','ref_area,','zenith','azimuth','v_wind','air_temp',...
-    'pressure_air','speed_of_sound','simulation_step_time','computation_time','dynamic pressure'};
+    'pressure_air','speed_of_sound','simulation_step_time','computation_time'};
 
 % trajectory plots
 figure()
 yyaxis right
-plot(data.time,data.altitude,'-k','LineWidth',1.5);
+plot(data.time,data.altitude,'-k','LineWidth',2);
 hold on
 ylabel('Altitude (m)','Interpreter','latex','FontSize',14);
 yyaxis left
-plot(data.time,data.vert_vel,'-r','LineWidth',1.5);
-plot(data.time,data.vert_acc, '-b', 'LineWidth',1.5);
+plot(data.time,data.vert_vel,'-r','LineWidth',2);
+plot(data.time,data.vert_acc, '-b', 'LineWidth',2);
 xlabel('Time (s)','Interpreter','latex','FontSize',14);
 ylabel('Vertical Velocity (m/s), Vertical Acceleration (m/s$^2$)','Interpreter','latex','FontSize',14);
 legend({'Vertical Velocity','Vertical Acceleration','Altitude'},'Location','northeast','Interpreter','latex','FontSize',14);
