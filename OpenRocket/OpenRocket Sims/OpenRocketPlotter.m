@@ -17,7 +17,7 @@ clear; clc; close all
 % UNSELECT all comments (simulation descriptions, field descriptions and
 % flight events)
 
-filename = 'CDR_data.csv';
+filename = 'march_design_review_8ms';
 data = readtable(filename);
 
 % u may need to chnage variable names here cus im stupid and made some
