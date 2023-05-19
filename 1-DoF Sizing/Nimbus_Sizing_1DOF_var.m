@@ -11,14 +11,14 @@ p0 = 101325;        % sea level pressure (Pa)
 R = 287;            % think its called the gas constant right !? it's late and i don't remember
 
 % Engine Parameters
-OF = 3.5;                         % OF ratio
+OF = 3.5;                       % OF ratio
 m0_ox = 7;                      % oxidizer mass of rocket, kg
 m0_fuel = m0_ox/OF;             % fuel mass of rocket, kg
 m_propellant = m0_fuel + m0_ox; % total propellant mass, kg
 
-Isp = 220;   % Specific impulse of the rocket, s
+Isp = 250;   % Specific impulse of the rocket, s
 V_e = g*Isp; % exhaust velocity, m/s
-T = 3000;    % Thrust, N - we're gonna assume no regression for now
+T = 15000;    % Thrust, N - we're gonna assume no regression for now
 
 m_f_dot = (T/V_e)*(1/(OF+1));       % fuel mass flow rate
 m_ox_dot = (T/V_e)*(OF/(OF+1));     % oxidiser mass flow rate
