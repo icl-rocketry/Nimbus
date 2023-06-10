@@ -193,4 +193,3 @@ TestFlight = Flight(rocket = Nimbus,
                     )
 
 TestFlight.allInfo()
-# %%
