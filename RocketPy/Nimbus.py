@@ -5,10 +5,11 @@
 # importing 
 from rocketpy import Environment, Rocket, Flight
 from rocketpy.motors import CylindricalTank, Fluid, MassFlowRateBasedTank, LiquidMotor
-
+import numpy as np
 
 #%%
 # environment set-up
+# lat and long are for euroc
 Env = Environment(
     railLength = 12, 
     latitude   = 39.4310, 
@@ -35,9 +36,9 @@ fuel_tank_shape = CylindricalTank(0.114/2, 0.332, True)
 nitrogen_tank_shape = CylindricalTank(0.096/2, 0.214, True)
 
 # check tank geometry 
-oxidiser_tank_shape.radius.plot(equalAxis = True)
-fuel_tank_shape.radius.plot(equalAxis = True)
-nitrogen_tank_shape.radius.plot(equalAxis = True)
+# oxidiser_tank_shape.radius.plot(equalAxis = True)
+# fuel_tank_shape.radius.plot(equalAxis = True)
+# nitrogen_tank_shape.radius.plot(equalAxis = True)
 
 # define fluids 
 oxidizer_liq = Fluid(name="N2O_l", density=800, quality=1)
@@ -90,11 +91,12 @@ THANOS.info()
 # note centreOfDryMassPosition = 0  means the dry cg is the origin of the rocket coordinate system
 
 Nimbus = Rocket(
-    radius = 19.4/2,
-    mass = 54.2-THANOS.propellantInitialMass,
-    inertia = [INERTIA TENSOR],
-    powerOffDrag = [FROM OPENROCKET],
-    powerOnDrag = [FROM OPENROCKET],
+    radius = 0.194/2,
+    mass = 45.3,
+    inertia = (4.75*10**10, 4.75*10**10, 2.387*10**8,
+               -23063, -8.278*10**6, -2.584*10**6),
+    powerOffDrag = "nimbus_Cd.csv",
+    powerOnDrag = "nimbus_Cd.csv",
     centerOfDryMassPosition = 0,
     coordinateSystemOrientation = "tailToNose",
 )
@@ -116,30 +118,79 @@ Tail = Nimbus.addTail(
 
 Fins = Nimbus.addTrapezoidalFins(
     n = 3,
-    span = ,
-    rootchord = ,
-    tipChord = ,
-    position = ,
-    cantAngle = ,
-    sweepLength = ,
-    sweepAngle = ,
-    radius = "None",
-    airfoil = "None",
+    span = 0.211,
+    rootChord = 0.322,
+    tipChord = 0.150,
+    position = -1.4,
+    cantAngle = 0,
+    # sweepLength = 0.085,
+    sweepAngle = 21.9,
+    radius = None,
+    airfoil = None,
 )
 
 Canards = Nimbus.addTrapezoidalFins(
     n = 3,
-    span = ,
-    rootchord = ,
-    tipChord = ,
-    position = ,
-    cantAngle = ,
-    sweepLength = ,
-    sweepAngle = ,
-    radius = "None",
-    airfoil = "None",
+    span = 0.05,
+    rootChord = 0.11,
+    tipChord = 0.045,
+    position = 1.05,
+    cantAngle = 0,
+    # sweepLength = 0.07,
+    sweepAngle = 54.5,
+    radius = None,
+    airfoil = None,
 )
 
-Nimbus.allInfo()
+# %%
+# Parachutes
+def drogueTrigger(p, y):
+    # p = pressure considering parachute noise signal
+    # h = height above ground level considering parachute noise signal
+    # y = [x, y, z, vx, vy, vz, e0, e1, e2, e3, w1, w2, w3]
 
-``
+    # activate drogue when vz < 0 m/s.
+    return True if y[5] < 0 else False
+
+
+def mainTrigger(p, y):
+    # p = pressure considering parachute noise signal
+    # h = height above ground level considering parachute noise signal
+    # y = [x, y, z, vx, vy, vz, e0, e1, e2, e3, w1, w2, w3]
+
+    # activate main when vz < 0 m/s and z < 800 m
+    return True if y[5] < 0 and y[2] < 450 else False
+
+
+Main = Nimbus.addParachute(
+    "Main",
+    CdS = 0.97*np.pi*6.10**2 / 4,
+    trigger = mainTrigger,
+    samplingRate = 105,
+    lag = 1.5,
+    noise = (0, 8.3, 0.5),
+)
+
+Drogue = Nimbus.addParachute(
+    "Drogue",
+    CdS = 0.97*np.pi*0.914**2 / 4,
+    trigger = drogueTrigger,
+    samplingRate = 105,
+    lag = 1.5,
+    noise = (0, 8.3, 0.5),
+)
+
+# %% 
+# Nimbus info
+Nimbus.info()
+
+# %%
+# Lets see if Nimbus can fly
+TestFlight = Flight(rocket = Nimbus, 
+                    environment = Env, 
+                    inclination = 89, 
+                    heading = 0,  
+                    )
+
+TestFlight.allInfo()
+# %%
