@@ -195,3 +195,5 @@ NimbusFlight = Flight(rocket = Nimbus,
                     )
 
 NimbusFlight.allInfo()
+
+# %%
