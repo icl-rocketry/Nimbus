@@ -11,10 +11,10 @@ import numpy as np
 # environment set-up
 # lat and long are for euroc
 Env = Environment( 
-    latitude   = 39.4310, 
-    longitude  = -008.3012, 
-    elevation  = 135,
-)
+    latitude   = 39.232292, 
+    longitude  = -008.172027, 
+    elevation  = 160,
+    )
 
 # set date and time
 import datetime
@@ -50,11 +50,12 @@ fuel_gas = Fluid(name="methanol_g", density=1.59, quality=1)
 oxidizer_tank = MassFlowRateBasedTank(
     name = "oxidizer tank",
     geometry = oxidiser_tank_shape,
-    flux_time = 6.2,
+    flux_time = 7,
     initial_liquid_mass = 7,
     initial_gas_mass = 0,
     liquid_mass_flow_rate_in = 0,
-    liquid_mass_flow_rate_out = 1.01,
+    # liquid_mass_flow_rate_out = 1.01,
+    liquid_mass_flow_rate_out = 0.875, 
     gas_mass_flow_rate_in = 0.078,
     gas_mass_flow_rate_out = 0,
     liquid = oxidizer_liq,
@@ -64,11 +65,12 @@ oxidizer_tank = MassFlowRateBasedTank(
 fuel_tank = MassFlowRateBasedTank(
     name = "fuel tank",
     geometry = fuel_tank_shape,
-    flux_time = 6.2,
+    flux_time = 7,
     initial_liquid_mass = 2,
     initial_gas_mass = 0,
     liquid_mass_flow_rate_in = 0,
-    liquid_mass_flow_rate_out = 0.29,
+    # liquid_mass_flow_rate_out = 0.29,
+    liquid_mass_flow_rate_out = 0.2,
     gas_mass_flow_rate_in = 0.022,
     gas_mass_flow_rate_out = 0,
     liquid = fuel_liq,
@@ -77,12 +79,12 @@ fuel_tank = MassFlowRateBasedTank(
  
 # liquid engine 
 THANOS = LiquidMotor(
-    thrust_source = 3500,
+    thrust_source = "nimbus_thrust.eng",
     center_of_dry_mass = 0,
-    burn_time = 6.2,
+    # burn_time = 6,
     dry_mass = 0,
     dry_inertia = (0,0,0),
-    nozzle_radius = 0.038,
+    nozzle_radius = 0.037385,
 )
 
 THANOS.add_tank(oxidizer_tank, 0.98)
@@ -151,7 +153,7 @@ Canards = NimbusAscent.add_trapezoidal_fins(
     # sweep_length = 0.07,
     sweep_angle = 54.5,
     radius = None,
-    airfoil = None,
+    airfoil = ["xf-n0012-il-100000.csv", "degrees"],
 )
 
 # Parachutes
@@ -198,9 +200,9 @@ NimbusAscent.info()
 NimbusAscentFlight = Flight(rocket = NimbusAscent, 
                     environment = Env, 
                     rail_length = 12,
-                    inclination = 86, 
-                    heading = 0,  
-                    terminate_on_apogee = False,
+                    inclination = 84, 
+                    heading = 133,  
+                    terminate_on_apogee = True,
                     name = "NimbusAscentFlight",
                     )
 
