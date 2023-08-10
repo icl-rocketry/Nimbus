@@ -18,7 +18,7 @@ Env = Environment(
 
 # set date and time
 import datetime
-tomorrow = datetime.date.today() + datetime.timedelta(days = 1)
+tomorrow = datetime.date.today() + datetime.timedelta(days = 10)
 Env.set_date((tomorrow.year, tomorrow.month, tomorrow.day, 12))  # Hour given in UTC time
 
 # GFS forecast to get the atmospheric conditions for flight.
@@ -202,14 +202,14 @@ NimbusAscentFlight = Flight(rocket = NimbusAscent,
                     rail_length = 12,
                     inclination = 84, 
                     heading = 133,  
-                    terminate_on_apogee = True,
-                    name = "NimbusAscentFlight",
+                    terminate_on_apogee = False,
+                    name = "Nimbus Ascent Trajectory",
                     )
 
 NimbusAscentFlight.all_info()
 
-# #%% 
-# # Nimbus descent set-up
+#%% 
+# Nimbus descent set-up
 
 # NimbusDescent = Rocket(
 #     radius = 0.194/2,
@@ -268,57 +268,59 @@ NimbusAscentFlight.all_info()
 #                     inclination = 0, 
 #                     heading = 0,  
 #                     initial_solution = NimbusAscentFlight,
+#                     name = "Nimbus Descent Trajectory",
 #                     )
 
 # NimbusDescentFlight.all_info()
 
-# %% 
-# Marge set-up
+# # %% 
+# # Marge set-up
 
-Marge = Rocket(
-    radius = 0.1/2,
-    mass = MargeMass,
-    # everything else here is just a dummy variable
-    inertia = (4.75*10**10, 4.75*10**10, 2.387*10**8,
-               -23063, -8.278*10**6, -2.584*10**6),
-    power_off_drag = "nimbus_Cd.csv",
-    power_on_drag = "nimbus_Cd.csv",
-    center_of_mass_without_motor = 0,
-    coordinate_system_orientation = "tail_to_nose",
-)
+# Marge = Rocket(
+#     radius = 0.1/2,
+#     mass = MargeMass,
+#     # everything else here is just a dummy variable
+#     inertia = (4.75*10**10, 4.75*10**10, 2.387*10**8,
+#                -23063, -8.278*10**6, -2.584*10**6),
+#     power_off_drag = "nimbus_Cd.csv",
+#     power_on_drag = "nimbus_Cd.csv",
+#     center_of_mass_without_motor = 0,
+#     coordinate_system_orientation = "tail_to_nose",
+# )
 
-def marge_chute_trigger(p,h,y):
-    # p = pressure considering parachute noise signal
-    # h = height above ground level considering parachute noise signal
-    # y = [x, y, z, vx, vy, vz, e0, e1, e2, e3, w1, w2, w3]
+# def marge_chute_trigger(p,h,y):
+#     # p = pressure considering parachute noise signal
+#     # h = height above ground level considering parachute noise signal
+#     # y = [x, y, z, vx, vy, vz, e0, e1, e2, e3, w1, w2, w3]
 
-    # activate when vz < 0 m/s
-    return True if y[5] < 0 else False
+#     # activate when vz < 0 m/s
+#     return True if y[5] < 0 else False
 
-MargeChute = Marge.add_parachute(
-    "MargeChute",
-    cd_s = 0.97*np.pi*0.9144**2 / 4,
-    trigger = marge_chute_trigger,
-    sampling_rate = 105,
-    lag = 1.5,
-    noise = (0, 8.3, 0.5),
-)
+# MargeChute = Marge.add_parachute(
+#     "MargeChute",
+#     cd_s = 0.97*np.pi*0.9144**2 / 4,
+#     trigger = marge_chute_trigger,
+#     sampling_rate = 105,
+#     lag = 1.5,
+#     noise = (0, 8.3, 0.5),
+# )
 
-#%% 
-# Marge flight simulation
-MargeFlight = Flight(rocket = Marge, 
-                    environment = Env, 
-                    rail_length = 12,
-                    inclination = 0, 
-                    heading = 0,  
-                    # initial_solution = NimbusAscentFlight,
-                    )
+# #%% 
+# # Marge flight simulation
+# MargeFlight = Flight(rocket = Marge, 
+#                     environment = Env, 
+#                     rail_length = 12,
+#                     inclination = 0, 
+#                     heading = 0,  
+#                     initial_solution = NimbusAscentFlight,
+#                     name = "Payload Descent Trajectory",
+#                     )
 
-#%% 
-# Compare flights
+# #%% 
+# # Compare flights
 
-from rocketpy.plots.compare import CompareFlights
+# from rocketpy.plots.compare import CompareFlights
 # comparison = CompareFlights([NimbusAscentFlight, NimbusDescentFlight, MargeFlight])
-comparison = CompareFlights([NimbusAscentFlight, MargeFlight])
+# # comparison = CompareFlights([NimbusAscentFlight, MargeFlight])
 
-comparison.trajectories_3d(legend = True)
+# comparison.trajectories_3d(legend = True)
