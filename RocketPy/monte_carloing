@@ -1,0 +1,19 @@
+from datetime import datetime 
+from time import process_time, perf_counter, time 
+import glob
+
+from rocketpy import Environment, Rocket, Flight
+from rocketpy.motors import CylindricalTank, Fluid, MassFlowRateBasedTank, LiquidMotor
+
+import numpy as np
+from numpy.random import normal, uniform, choice
+from IPython.display import display
+
+import matplotlib as mpl
+import matplotlib.pyplot as plt
+
+mpl.rcParams["figure.figsize"] = [8,5]
+mpl.rcParams["figure.dpi"] = 120
+mpl.rcParams["font.size"] = 14
+mpl.rcParams["legend.fontsize"] = 14
+mpl.rcParams["figure.titlesize"] = 14

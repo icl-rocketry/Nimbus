@@ -18,7 +18,7 @@ Env = Environment(
 
 # set date and time
 import datetime
-tomorrow = datetime.date.today() + datetime.timedelta(days = 10)
+tomorrow = datetime.date.today() + datetime.timedelta(days = 1)
 Env.set_date((tomorrow.year, tomorrow.month, tomorrow.day, 12))  # Hour given in UTC time
 
 # GFS forecast to get the atmospheric conditions for flight.
@@ -50,7 +50,7 @@ fuel_gas = Fluid(name="methanol_g", density=1.59, quality=1)
 oxidizer_tank = MassFlowRateBasedTank(
     name = "oxidizer tank",
     geometry = oxidiser_tank_shape,
-    flux_time = 7,
+    flux_time = 6.75,
     initial_liquid_mass = 7,
     initial_gas_mass = 0,
     liquid_mass_flow_rate_in = 0,
@@ -65,7 +65,7 @@ oxidizer_tank = MassFlowRateBasedTank(
 fuel_tank = MassFlowRateBasedTank(
     name = "fuel tank",
     geometry = fuel_tank_shape,
-    flux_time = 7,
+    flux_time = 6.75,
     initial_liquid_mass = 2,
     initial_gas_mass = 0,
     liquid_mass_flow_rate_in = 0,
@@ -139,7 +139,7 @@ Fins = NimbusAscent.add_trapezoidal_fins(
     cant_angle = 0,
     # sweep_length = 0.085,
     sweep_angle = 21.9,
-    radius = None,
+    radius = 0.194/2,
     airfoil = None,
 )
 
@@ -152,8 +152,74 @@ Canards = NimbusAscent.add_trapezoidal_fins(
     cant_angle = 0,
     # sweep_length = 0.07,
     sweep_angle = 54.5,
-    radius = None,
+    radius = 0.194/2,
     airfoil = ["xf-n0012-il-100000.csv", "degrees"],
+)
+
+# Parachutes
+# def drogue_trigger(p, h, y):
+#     # p = pressure considering parachute noise signal
+#     # h = height above ground level considering parachute noise signal
+#     # y = [x, y, z, vx, vy, vz, e0, e1, e2, e3, w1, w2, w3]
+
+#     # activate drogue when vz < 0 m/s.
+#     return True if y[5] < 0 else False
+
+
+# def main_trigger(p, h, y):
+#     # p = pressure considering parachute noise signal
+#     # h = height above ground level considering parachute noise signal
+#     # y = [x, y, z, vx, vy, vz, e0, e1, e2, e3, w1, w2, w3]
+
+#     # activate main when vz < 0 m/s and z < 800 m
+#     return True if y[5] < 0 and h < 450 else False
+
+# Main = NimbusAscent.add_parachute(
+#     "Main",
+#     cd_s = 0.97*np.pi*6.10**2 / 4,
+#     trigger = main_trigger,
+#     sampling_rate = 105,
+#     lag = 1.5,
+#     noise = (0, 8.3, 0.5),
+# )
+
+# Drogue = NimbusAscent.add_parachute(
+#     "Drogue",
+#     cd_s = 0.9*np.pi*0.914**2 / 4,
+#     trigger = drogue_trigger,
+#     sampling_rate = 105,
+#     lag = 1.5,
+#     noise = (0, 8.3, 0.5),
+# )
+
+NimbusAscent.info()
+
+#%% 
+# Nimbus ascent simulation
+
+NimbusAscentFlight = Flight(rocket = NimbusAscent, 
+                    environment = Env, 
+                    rail_length = 12,
+                    inclination = 84, 
+                    heading = 133,  
+                    terminate_on_apogee = True,
+                    name = "Nimbus Ascent Trajectory",
+                    )
+
+NimbusAscentFlight.all_info()
+
+#%% 
+# Nimbus descent set-up
+
+NimbusDescent = Rocket(
+    radius = 0.194/2,
+    mass = NimbusMass,
+    inertia = (4.75*10**10, 4.75*10**10, 2.387*10**8,
+               -23063, -8.278*10**6, -2.584*10**6),
+    power_off_drag = "nimbus_Cd.csv",
+    power_on_drag = "nimbus_Cd.csv",
+    center_of_mass_without_motor = 0,
+    coordinate_system_orientation = "tail_to_nose",
 )
 
 # Parachutes
@@ -174,7 +240,7 @@ def main_trigger(p, h, y):
     # activate main when vz < 0 m/s and z < 800 m
     return True if y[5] < 0 and h < 450 else False
 
-Main = NimbusAscent.add_parachute(
+Main = NimbusDescent.add_parachute(
     "Main",
     cd_s = 0.97*np.pi*6.10**2 / 4,
     trigger = main_trigger,
@@ -183,7 +249,7 @@ Main = NimbusAscent.add_parachute(
     noise = (0, 8.3, 0.5),
 )
 
-Drogue = NimbusAscent.add_parachute(
+Drogue = NimbusDescent.add_parachute(
     "Drogue",
     cd_s = 0.97*np.pi*0.914**2 / 4,
     trigger = drogue_trigger,
@@ -192,86 +258,20 @@ Drogue = NimbusAscent.add_parachute(
     noise = (0, 8.3, 0.5),
 )
 
-NimbusAscent.info()
+NimbusDescent.info()
 
 #%% 
-# Nimbus ascent simulation
-
-NimbusAscentFlight = Flight(rocket = NimbusAscent, 
+# Nimbus descent simulation
+NimbusDescentFlight = Flight(rocket = NimbusDescent, 
                     environment = Env, 
                     rail_length = 12,
-                    inclination = 84, 
-                    heading = 133,  
-                    terminate_on_apogee = False,
-                    name = "Nimbus Ascent Trajectory",
+                    inclination = 0, 
+                    heading = 0,  
+                    initial_solution = NimbusAscentFlight,
+                    name = "Nimbus Descent Trajectory",
                     )
 
-NimbusAscentFlight.all_info()
-
-#%% 
-# Nimbus descent set-up
-
-# NimbusDescent = Rocket(
-#     radius = 0.194/2,
-#     mass = NimbusMass,
-#     inertia = (4.75*10**10, 4.75*10**10, 2.387*10**8,
-#                -23063, -8.278*10**6, -2.584*10**6),
-#     power_off_drag = "nimbus_Cd.csv",
-#     power_on_drag = "nimbus_Cd.csv",
-#     center_of_mass_without_motor = 0,
-#     coordinate_system_orientation = "tail_to_nose",
-# )
-
-# # Parachutes
-# def drogue_trigger(p, h, y):
-#     # p = pressure considering parachute noise signal
-#     # h = height above ground level considering parachute noise signal
-#     # y = [x, y, z, vx, vy, vz, e0, e1, e2, e3, w1, w2, w3]
-
-#     # activate drogue when vz < 0 m/s.
-#     return True if y[5] < 0 else False
-
-
-# def main_trigger(p, h, y):
-#     # p = pressure considering parachute noise signal
-#     # h = height above ground level considering parachute noise signal
-#     # y = [x, y, z, vx, vy, vz, e0, e1, e2, e3, w1, w2, w3]
-
-#     # activate main when vz < 0 m/s and z < 800 m
-#     return True if y[5] < 0 and h < 450 else False
-
-# Main = NimbusDescent.add_parachute(
-#     "Main",
-#     cd_s = 0.97*np.pi*6.10**2 / 4,
-#     trigger = main_trigger,
-#     sampling_rate = 105,
-#     lag = 1.5,
-#     noise = (0, 8.3, 0.5),
-# )
-
-# Drogue = NimbusDescent.add_parachute(
-#     "Drogue",
-#     cd_s = 0.97*np.pi*0.914**2 / 4,
-#     trigger = drogue_trigger,
-#     sampling_rate = 105,
-#     lag = 1.5,
-#     noise = (0, 8.3, 0.5),
-# )
-
-# NimbusDescent.info()
-
-# #%% 
-# # Nimbus descent simulation
-# NimbusDescentFlight = Flight(rocket = NimbusDescent, 
-#                     environment = Env, 
-#                     rail_length = 12,
-#                     inclination = 0, 
-#                     heading = 0,  
-#                     initial_solution = NimbusAscentFlight,
-#                     name = "Nimbus Descent Trajectory",
-#                     )
-
-# NimbusDescentFlight.all_info()
+NimbusDescentFlight.all_info()
 
 # # %% 
 # # Marge set-up
@@ -324,3 +324,4 @@ NimbusAscentFlight.all_info()
 # # comparison = CompareFlights([NimbusAscentFlight, MargeFlight])
 
 # comparison.trajectories_3d(legend = True)
+# %%
