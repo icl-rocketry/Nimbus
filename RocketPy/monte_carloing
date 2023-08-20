@@ -17,3 +17,41 @@ mpl.rcParams["figure.dpi"] = 120
 mpl.rcParams["font.size"] = 14
 mpl.rcParams["legend.fontsize"] = 14
 mpl.rcParams["figure.titlesize"] = 14
+
+analysis_parameters = {
+    "rocketMass": (47.2, 0.01),
+    "inclination": (84, 2),
+    "heading": (133, 5),
+    "railLength": (5.7, 0.0005), 
+}
+
+# flight settings generator
+def flight_setting(analysis_parameters, total_number):
+    i = 0
+    while i < total_number:
+        flight_setting = {}
+        for parameter_key, parameter_value in analysis_parameters.items():
+            if type(parameter_value) is tuple:
+                flight_setting[parameter_key] = normal(*parameter_value)
+            else:
+                flight_setting[parameter_key] = choice(parameter_value)
+
+        i += 1
+        yield flight_setting 
+
+# export function
+def export_flight_data(flight_setting, flight_data, exec_time):
+    flight_result = {
+        "outOfRailTime": flight_data.out_of_rail_time,
+        "outOfRailVelocity": flight_data.out_of_rail_velocity,
+        "apogeeTime": flight_data.apogee_time,
+        "apogeeAltitude": flight_data.apogee - Env.elevation,
+        "apogeeX": flight_data.apogee_x,
+        "apogeeY": flight_data.apogee_y,
+        "impactTime": flight_data.impactTime,
+        "impactX": flight_data.impactX,
+        "impactY": flight_data.impactY,
+        "impactVelocity": flight_data.impactVelocity,
+        "outOfRailStaticMargin": flight_data.rocket.static_margin(0),
+        "initialStaticMargin": flight_data.initialStaticMargin,
+    }

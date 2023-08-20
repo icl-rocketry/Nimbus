@@ -21,7 +21,7 @@ Env = Environment(
 
 # set date and time
 import datetime
-tomorrow = datetime.date.today() + datetime.timedelta(days = 1)
+tomorrow = datetime.date.today() + datetime.timedelta(days = 11)
 Env.set_date((tomorrow.year, tomorrow.month, tomorrow.day, 12))  # Hour given in UTC time
 
 # GFS forecast to get the atmospheric conditions for flight.
@@ -34,7 +34,7 @@ Env.info()
 # propulsion system 
 
 # tank geometries
-oxidiser_tank_shape = CylindricalTank(0.168/2, 0.437, True)
+oxidiser_tank_shape = CylindricalTank(0.086, 0.639, True)
 fuel_tank_shape = CylindricalTank(0.114/2, 0.332, True)
 nitrogen_tank_shape = CylindricalTank(0.096/2, 0.214, True)
 
@@ -100,12 +100,14 @@ THANOS.info()
 
 # note centreOfDryMassPosition = 0  means the dry cg is the origin of the rocket coordinate system
 
-MargeMass = 3.2; # Payload mass with chute
-NimbusMass = 47.2 - MargeMass; # Nimbus dry mass excluding payload
+MargeMass = 3.1; # Payload mass with chute
+NimbusMass = 50.2 - MargeMass; # Nimbus dry mass excluding payload
 
 NimbusAscent = Rocket(
     radius = 0.194/2,
     mass = NimbusMass + MargeMass,
+    # inertia = (4.75*10**10, 4.75*10**10, 2.387*10**8,
+    #            -23063, -8.278*10**6, -2.584*10**6),
     inertia = (4.75*10**10, 4.75*10**10, 2.387*10**8,
                -23063, -8.278*10**6, -2.584*10**6),
     power_off_drag = "nimbus_Cd.csv",
@@ -135,13 +137,13 @@ Tail = NimbusAscent.add_tail(
 
 Fins = NimbusAscent.add_trapezoidal_fins(
     n = 3,
-    span = 0.211,
-    root_chord = 0.322,
+    span = 0.21,
+    root_chord = 0.320,
     tip_chord = 0.150,
     position = -1.4,
     cant_angle = 0,
     # sweep_length = 0.085,
-    sweep_angle = 21.9,
+    sweep_angle = 21.942, # leading edge sweep
     radius = 0.194/2,
     airfoil = None,
 )
