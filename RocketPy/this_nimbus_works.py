@@ -1,9 +1,6 @@
 # Nimbus is it a broomstick, I dont think so but it would've been so much more amazing 
 # 'Usmaan's going to suffer' - Kiran 2023
 
-# this nimbus works on the pre-release and on the current beta (14/08)
-# its just the simple flight simulation from ascent 
-
 #%% 
 # importing 
 from rocketpy import Environment, Rocket, Flight
@@ -208,7 +205,7 @@ NimbusAscentFlight = Flight(rocket = NimbusAscent,
                     rail_length = 12,
                     inclination = 84, 
                     heading = 133,  
-                    terminate_on_apogee = True,
+                    terminate_on_apogee = False,
                     name = "Nimbus Ascent Trajectory",
                     )
 
