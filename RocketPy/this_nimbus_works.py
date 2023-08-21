@@ -21,7 +21,7 @@ Env = Environment(
 
 # set date and time
 import datetime
-tomorrow = datetime.date.today() + datetime.timedelta(days = 11)
+tomorrow = datetime.date.today() + datetime.timedelta(days = 14)
 Env.set_date((tomorrow.year, tomorrow.month, tomorrow.day, 12))  # Hour given in UTC time
 
 # GFS forecast to get the atmospheric conditions for flight.
@@ -194,7 +194,7 @@ Drogue = NimbusAscent.add_parachute(
     cd_s = 0.9*np.pi*0.914**2 / 4,
     trigger = drogue_trigger,
     sampling_rate = 105,
-    lag = 1.5,
+    lag = 1.0,
     noise = (0, 8.3, 0.5),
 )
 
@@ -208,7 +208,7 @@ NimbusAscentFlight = Flight(rocket = NimbusAscent,
                     rail_length = 12,
                     inclination = 84, 
                     heading = 133,  
-                    terminate_on_apogee = False,
+                    terminate_on_apogee = True,
                     name = "Nimbus Ascent Trajectory",
                     )
 

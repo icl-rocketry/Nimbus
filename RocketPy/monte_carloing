@@ -53,5 +53,5 @@ def export_flight_data(flight_setting, flight_data, exec_time):
         "impactY": flight_data.impactY,
         "impactVelocity": flight_data.impactVelocity,
         "outOfRailStaticMargin": flight_data.rocket.static_margin(0),
-        "initialStaticMargin": flight_data.initialStaticMargin,
+        "initialStaticMargin": flight_data.rocket.initial_static_margin,
     }
