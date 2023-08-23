@@ -101,7 +101,7 @@ def export_flight_error(flight_setting):
     monte_carlo_error_file.write(str(flight_setting) + "\n")
 
 filename = "monte_carlo_outputs/nimbus"
-simulation_number = 2000
+simulation_number = 200
 
 monte_carlo_error_file = open(str(filename) + ".disp_errors.txt", "w")
 monte_carlo_input_file = open(str(filename) + ".disp_inputs.txt", "w")
@@ -354,3 +354,5 @@ monte_carlo_output_file.close()
 
 N = len(dispersion_general_results)
 print("Number of simulations: ", N)
+
+ 
