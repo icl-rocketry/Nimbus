@@ -1,6 +1,3 @@
-# Nimbus is it a broomstick, I dont think so but it would've been so much more amazing 
-# 'Usmaan's going to suffer' - Kiran 2023
-
 #%% 
 # importing 
 from rocketpy import Environment, Rocket, Flight, Function
@@ -18,8 +15,8 @@ Env = Environment(
 
 # set date and time
 import datetime
-tomorrow = datetime.date.today() + datetime.timedelta(days = 12)
-Env.set_date((tomorrow.year, tomorrow.month, tomorrow.day, 15))  # Hour given in UTC time
+tomorrow = datetime.date.today() + datetime.timedelta(days = 1)
+Env.set_date((tomorrow.year, tomorrow.month, tomorrow.day, 12))  # Hour given in UTC time
 
 # GFS forecast to get the atmospheric conditions for flight.
 Env.set_atmospheric_model(type="Forecast", file="GFS")
@@ -205,40 +202,8 @@ NimbusAscentFlight = Flight(rocket = NimbusAscent,
                     rail_length = 12,
                     inclination = 84, 
                     heading = 133,  
-                    terminate_on_apogee = True,
+                    terminate_on_apogee = False,
                     name = "Nimbus Ascent Trajectory",
                     )
 
 NimbusAscentFlight.all_info()
-
-#%% 
-# additional test plots
-import copy 
-
-def speed(mass):
-    mock_rocket = copy.deepcopy(NimbusAscent)
-
-    # Modify the mass
-    mock_rocket.mass = mass
-    mock_rocket.evaluate_dry_mass()
-    mock_rocket.evaluate_total_mass()
-    mock_rocket.evaluate_center_of_dry_mass()
-    mock_rocket.evaluate_center_of_mass()
-    mock_rocket.evaluate_reduced_mass()
-    mock_rocket.evaluate_thrust_to_weight()
-    mock_rocket.evaluate_static_margin()
-
-    # Simulate Flight until Apogee
-    test_flight = Flight(
-        rocket = mock_rocket,
-        environment = Env,
-        rail_length = 12,
-        inclination = 84,
-        heading = 133,
-        terminate_on_apogee = True,
-    )
-    return test_flight.out_of_rail_velocity
-
-
-speedbymass = Function(speed, inputs="Mass (kg)", outputs="Out of Rail Speed (m/s)")
-speedbymass.plot(47, 53, 20)

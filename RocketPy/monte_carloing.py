@@ -1,6 +1,6 @@
 from datetime import datetime 
 from time import process_time, perf_counter, time 
-import glob
+# import glob
 
 from rocketpy import Environment, Rocket, Flight, Function
 from rocketpy.motors import CylindricalTank, Fluid, MassFlowRateBasedTank, LiquidMotor
@@ -48,9 +48,9 @@ def export_flight_data(flight_setting, flight_data, exec_time):
         "apogeeAltitude": flight_data.apogee - Env.elevation,
         "apogeeX": flight_data.apogee_x,
         "apogeeY": flight_data.apogee_y,
-        "impactTime": flight_data.impact_time,
-        "impactX": flight_data.impact_x,
-        "impactY": flight_data.impact_y,
+        # "impactTime": flight_data.impact_time,
+        "impactX": flight_data.x_impact,
+        "impactY": flight_data.y_impact,
         "impactVelocity": flight_data.impact_velocity,
         "initialStaticMargin": flight_data.rocket.static_margin(0),
         "outOfRailStaticMargin": flight_data.rocket.static_margin(TestFlight.out_of_rail_time),
@@ -73,9 +73,7 @@ def export_flight_data(flight_setting, flight_data, exec_time):
         sol[:, [0,6]], "Time (s)", "Vz (m/s)", "linear", extrapolation = "natural"
     )
 
-    flight_data.v = (
-        flight_data.vx**2 + flight_data.vy**2 + flight_data.vx**2
-    ) ** 0.5
+    flight_data.v = (flight_data.vx**2 + flight_data.vy**2 + flight_data.vx**2) ** 0.5
 
     flight_data.max_vel = np.amax(flight_data.v.source[:,1])
     flight_result["maxVelocity"] = flight_data.max_vel
@@ -273,7 +271,6 @@ for setting in flight_settings(analysis_parameters, simulation_number):
     Main = NimbusAscent.add_parachute(
         "Main",
         cd_s = 0.97*np.pi*6.10**2 / 4,
-        # cd_s = 2.2*np.pi*4.26**2 / 4,
         trigger = main_trigger,
         sampling_rate = 105,
         lag = 1.5,
@@ -304,12 +301,12 @@ for setting in flight_settings(analysis_parameters, simulation_number):
         print(E)
         export_flight_error(setting)
 
-    out.update(
-        f"Current iteration: {i:06d} | Average Time per Iteration: {(process_time() - initial_cpu_time)/i:2.6f} s"
-    )
+    # out.update(
+    #     f"Current iteration: {i:06d} | Average Time per Iteration: {(process_time() - initial_cpu_time)/i:2.6f} s"
+    # )
 
 final_string = f"Completed {i} iterations successfully. Total CPU time: {process_time() - initial_cpu_time} s. Total wall time {time() - initial_wall_time} s"
-out.update(final_string)
+# out.update(final_string)
 monte_carlo_input_file.write(final_string + "\n")
 monte_carlo_output_file.write(final_string + "\n")
 monte_carlo_error_file.write(final_string + "\n")
@@ -329,7 +326,7 @@ dispersion_results = {
     "apogeeAltitude": [],
     "apogeeX": [],
     "apogeeY": [],
-    "impactTime": [],
+    # "impactTime": [],
     "impactX": [],
     "impactY": [],
     "impactVelocity": [],
@@ -443,19 +440,19 @@ plt.xlabel("Apogee Y Position (m)")
 plt.ylabel("Number of Occurences")
 plt.show()
 
-print(
-    f'Impact Time -         Mean Value: {np.mean(dispersion_results["impactTime"]):0.3f} s'
-)
-print(
-    f'Impact Time - Standard Deviation: {np.std(dispersion_results["impactTime"]):0.3f} s'
-)
+# print(
+#     f'Impact Time -         Mean Value: {np.mean(dispersion_results["impactTime"]):0.3f} s'
+# )
+# print(
+#     f'Impact Time - Standard Deviation: {np.std(dispersion_results["impactTime"]):0.3f} s'
+# )
 
-plt.figure()
-plt.hist(dispersion_results["impactTime"], bins=int(N**0.5))
-plt.title("Impact Time")
-plt.xlabel("Time (s)")
-plt.ylabel("Number of Occurences")
-plt.show()
+# plt.figure()
+# plt.hist(dispersion_results["impactTime"], bins=int(N**0.5))
+# plt.title("Impact Time")
+# plt.xlabel("Time (s)")
+# plt.ylabel("Number of Occurences")
+# plt.show()
 
 print(
     f'Impact X Position -         Mean Value: {np.mean(dispersion_results["impactX"]):0.3f} m'
