@@ -241,4 +241,4 @@ def speed(mass):
 
 
 speedbymass = Function(speed, inputs="Mass (kg)", outputs="Out of Rail Speed (m/s)")
-speedbymass.plot(47, 53, 20)
+speedbymass.plot(47, 52, 20)
