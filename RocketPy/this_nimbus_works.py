@@ -213,32 +213,32 @@ NimbusAscentFlight.all_info()
 
 #%% 
 # additional test plots
-# import copy 
+import copy 
 
-# def speed(mass):
-#     mock_rocket = copy.deepcopy(NimbusAscent)
+def speed(mass):
+    mock_rocket = copy.deepcopy(NimbusAscent)
 
-#     # Modify the mass
-#     mock_rocket.mass = mass
-#     mock_rocket.evaluate_dry_mass()
-#     mock_rocket.evaluate_total_mass()
-#     mock_rocket.evaluate_center_of_dry_mass()
-#     mock_rocket.evaluate_center_of_mass()
-#     mock_rocket.evaluate_reduced_mass()
-#     mock_rocket.evaluate_thrust_to_weight()
-#     mock_rocket.evaluate_static_margin()
+    # Modify the mass
+    mock_rocket.mass = mass
+    mock_rocket.evaluate_dry_mass()
+    mock_rocket.evaluate_total_mass()
+    mock_rocket.evaluate_center_of_dry_mass()
+    mock_rocket.evaluate_center_of_mass()
+    mock_rocket.evaluate_reduced_mass()
+    mock_rocket.evaluate_thrust_to_weight()
+    mock_rocket.evaluate_static_margin()
 
-#     # Simulate Flight until Apogee
-#     test_flight = Flight(
-#         rocket = mock_rocket,
-#         environment = Env,
-#         rail_length = 12,
-#         inclination = 84,
-#         heading = 133,
-#         terminate_on_apogee = True,
-#     )
-#     return test_flight.out_of_rail_velocity
+    # Simulate Flight until Apogee
+    test_flight = Flight(
+        rocket = mock_rocket,
+        environment = Env,
+        rail_length = 12,
+        inclination = 84,
+        heading = 133,
+        terminate_on_apogee = True,
+    )
+    return test_flight.out_of_rail_velocity
 
 
-# speedbymass = Function(speed, inputs="Mass (kg)", outputs="Out of Rail Speed (m/s)")
-# speedbymass.plot(47, 52, 20)
+speedbymass = Function(speed, inputs="Mass (kg)", outputs="Out of Rail Speed (m/s)")
+speedbymass.plot(47, 52, 20)
