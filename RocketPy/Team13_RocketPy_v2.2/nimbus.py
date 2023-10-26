@@ -91,7 +91,7 @@ THANOS.info()
 
 # note centreOfDryMassPosition = 0  means the dry cg is the origin of the rocket coordinate system
 
-MargeMass = 3.2; # Payload mass with chute
+MargeMass = 3.1; # Payload mass with chute
 NimbusMass = 50.2 - MargeMass; # Nimbus dry mass excluding payload
 
 NimbusAscent = Rocket(
@@ -153,64 +153,6 @@ Fins = NimbusAscent.add_trapezoidal_fins(
 # )
 
 # Parachutes
-# def drogue_trigger(p, h, y):
-#     # activate drogue when vz < 0 m/s.
-#     return True if y[5] < 0 else False
-
-
-# def main_trigger(p, h, y):
-#     # activate main when vz < 0 m/s and z < 800 m
-#     return True if y[5] < 0 and h < 450 else False
-
-# Main = NimbusAscent.add_parachute(
-#     "Main",
-#     cd_s = 0.97*np.pi*6.10**2 / 4,
-#     # cd_s = 2.2*np.pi*4.26**2 / 4,
-#     trigger = main_trigger,
-#     sampling_rate = 105,
-#     lag = 3.0,
-#     noise = (0, 8.3, 0.5),
-# )
-
-# Drogue = NimbusAscent.add_parachute(
-#     "Drogue",
-#     cd_s = 0.9*np.pi*0.914**2 / 4,
-#     trigger = drogue_trigger,
-#     sampling_rate = 105,
-#     lag = 1.0,
-#     noise = (0, 8.3, 0.5),
-# )
-
-# NimbusAscent.info()
-
-#%% 
-# Nimbus ascent simulation
-
-NimbusAscentFlight = Flight(rocket = NimbusAscent, 
-                    environment = Env, 
-                    rail_length = 12,
-                    inclination = 84, 
-                    heading = 133,  
-                    terminate_on_apogee = True,
-                    name = "Nimbus Ascent Trajectory",
-                    )
-
-NimbusAscentFlight.all_info()
-
-#%% 
-# Nimbus Descent set-up
-NimbusDescent = Rocket(
-    radius = 0.194/2,
-    mass = NimbusMass,
-    inertia = (47.6, 47.6, 0.2487,
-               -0.0003062, -0.09418, -0.02619),
-    power_off_drag = "nimbus_Cd.csv",
-    power_on_drag = "nimbus_Cd.csv",
-    center_of_mass_without_motor = 0,
-    coordinate_system_orientation = "tail_to_nose",
-)
-
-# Parachutes
 def drogue_trigger(p, h, y):
     # activate drogue when vz < 0 m/s.
     return True if y[5] < 0 else False
@@ -220,7 +162,7 @@ def main_trigger(p, h, y):
     # activate main when vz < 0 m/s and z < 800 m
     return True if y[5] < 0 and h < 450 else False
 
-Main = NimbusDescent.add_parachute(
+Main = NimbusAscent.add_parachute(
     "Main",
     cd_s = 0.97*np.pi*6.10**2 / 4,
     # cd_s = 2.2*np.pi*4.26**2 / 4,
@@ -230,7 +172,7 @@ Main = NimbusDescent.add_parachute(
     noise = (0, 8.3, 0.5),
 )
 
-Drogue = NimbusDescent.add_parachute(
+Drogue = NimbusAscent.add_parachute(
     "Drogue",
     cd_s = 0.9*np.pi*0.914**2 / 4,
     trigger = drogue_trigger,
@@ -239,60 +181,18 @@ Drogue = NimbusDescent.add_parachute(
     noise = (0, 8.3, 0.5),
 )
 
-#%%
-# Nimbus Descent Simulation
-NimbusDescentFlight = Flight(rocket = NimbusAscent, 
+NimbusAscent.info()
+
+#%% 
+# Nimbus ascent simulation
+
+NimbusAscentFlight = Flight(rocket = NimbusAscent, 
                     environment = Env, 
                     rail_length = 12,
                     inclination = 84, 
                     heading = 133,  
-                    initial_solution = NimbusAscentFlight,
-                    name = "Nimbus Descent Trajectory",
+                    terminate_on_apogee = False,
+                    name = "Nimbus Ascent Trajectory",
                     )
 
-# NimbusDescentFlight.all_info()
-
-#%% 
-# Payload set-up
-Marge = Rocket(
-    radius = 0.05,
-    mass = MargeMass,
-    inertia = (0.1,0.1,0.001),
-    power_off_drag = 0.5,
-    power_on_drag = 0.5,
-    center_of_mass_without_motor = 0
-)
-
-def payload_trigger(p, h, y):
-    # activate drogue when vz < 0 m/s.
-    return True if y[5] < 0 else False
-
-Drogue = Marge.add_parachute(
-    "Drogue",
-    cd_s = 0.9*np.pi*0.914**2 / 4,
-    trigger = drogue_trigger,
-    sampling_rate = 105,
-    lag = 1.0,
-    noise = (0, 8.3, 0.5),
-)
-
-#%% 
-# Payload Flight Simulation
-PayloadFlight = Flight(
-    rocket = Marge,
-    environment = Env,
-    rail_length = 12,
-    inclination = 0,
-    heading = 0,
-    initial_solution = NimbusAscentFlight,
-    name = "Payload Flight",
-)
-
-#%%
-# Flight comparisons
-from rocketpy.plots.compare import CompareFlights
-comparison = CompareFlights([NimbusAscentFlight, NimbusDescentFlight, PayloadFlight])
-comparison.trajectories_3d(legend = True)
-comparison.positions()
-comparison.velocities()
-comparison.accelerations()
+NimbusAscentFlight.all_info()

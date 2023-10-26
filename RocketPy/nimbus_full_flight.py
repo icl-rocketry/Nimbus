@@ -1,5 +1,4 @@
-# Nimbus is it a broomstick, I dont think so but it would've been so much more amazing 
-# 'Usmaan's going to suffer' - Kiran 2023
+# using rocketpy v1.0.0 master 
 
 #%% 
 # importing 
@@ -18,8 +17,8 @@ Env = Environment(
 
 # set date and time
 import datetime
-tomorrow = datetime.date.today() + datetime.timedelta(days = 12)
-Env.set_date((tomorrow.year, tomorrow.month, tomorrow.day, 15))  # Hour given in UTC time
+tomorrow = datetime.date.today() + datetime.timedelta(days = 1)
+Env.set_date((tomorrow.year, tomorrow.month, tomorrow.day, 14))  # Hour given in UTC time
 
 # GFS forecast to get the atmospheric conditions for flight.
 Env.set_atmospheric_model(type="Forecast", file="GFS")
@@ -35,16 +34,11 @@ oxidiser_tank_shape = CylindricalTank(0.086, 0.639, True)
 fuel_tank_shape = CylindricalTank(0.114/2, 0.332, True)
 nitrogen_tank_shape = CylindricalTank(0.096/2, 0.214, True)
 
-# check tank geometry 
-# oxidiser_tank_shape.radius.plot(equalAxis = True)
-# fuel_tank_shape.radius.plot(equalAxis = True)
-# nitrogen_tank_shape.radius.plot(equalAxis = True)
-
 # define fluids 
-oxidizer_liq = Fluid(name="N2O_l", density=800, quality=1)
-oxidizer_gas = Fluid(name="N2O_g", density=1.9277, quality=1)
-fuel_liq = Fluid(name="methanol_l", density=786, quality=1)
-fuel_gas = Fluid(name="methanol_g", density=1.59, quality=1)
+oxidizer_liq = Fluid(name="N2O_l", density=800)
+oxidizer_gas = Fluid(name="N2O_g", density=1.9277)
+fuel_liq = Fluid(name="methanol_l", density=786)
+fuel_gas = Fluid(name="methanol_g", density=1.59)
 
 # some tanks 
 oxidizer_tank = MassFlowRateBasedTank(
@@ -79,8 +73,8 @@ fuel_tank = MassFlowRateBasedTank(
  
 # liquid engine 
 THANOS = LiquidMotor(
-    thrust_source = "nimbus_thrust_hotfire.eng",
-    center_of_dry_mass = 0,
+    thrust_source = "nimbus_thrust_hotfire_cut_off.eng",
+    center_of_dry_mass_position = 0,
     # burn_time = 6,
     dry_mass = 0,
     dry_inertia = (0,0,0),
@@ -96,15 +90,17 @@ THANOS.info()
 # Nimbus ascent set-up
 
 # note centreOfDryMassPosition = 0  means the dry cg is the origin of the rocket coordinate system
-NimbusMass = 41; # Nimbus dry mass excluding payload
+
+MargeMass = 3.2; # Payload mass with chute
+NimbusMass = 50.2 - MargeMass; # Nimbus dry mass excluding payload
 
 NimbusAscent = Rocket(
     radius = 0.194/2,
-    mass = NimbusMass,
+    mass = NimbusMass + MargeMass,
     # inertia = (4.75*10**10, 4.75*10**10, 2.387*10**8,
     #            -23063, -8.278*10**6, -2.584*10**6),
-    inertia = (4.75*10**10, 4.75*10**10, 2.387*10**8,
-               -23063, -8.278*10**6, -2.584*10**6),
+    inertia = (47.6, 47.6, 0.2487,
+               -0.0003062, -0.09418, -0.02619),
     power_off_drag = "nimbus_Cd.csv",
     power_on_drag = "nimbus_Cd.csv",
     center_of_mass_without_motor = 0,
@@ -136,41 +132,33 @@ Fins = NimbusAscent.add_trapezoidal_fins(
     root_chord = 0.320,
     tip_chord = 0.150,
     position = -1.4,
-    cant_angle = 0,
+    cant_angle = 25,
     # sweep_length = 0.085,
     sweep_angle = 21.942, # leading edge sweep
     radius = 0.194/2,
     airfoil = None,
 )
 
-Canards = NimbusAscent.add_trapezoidal_fins(
-    n = 3,
-    span = 0.05,
-    root_chord = 0.11,
-    tip_chord = 0.045,
-    position = 1.05,
-    cant_angle = 0,
-    # sweep_length = 0.07,
-    sweep_angle = 54.5,
-    radius = 0.194/2,
-    airfoil = ["xf-n0012-il-100000.csv", "degrees"],
-)
+# Canards = NimbusAscent.add_trapezoidal_fins(
+#     n = 3,
+#     span = 0.05,
+#     root_chord = 0.11,
+#     tip_chord = 0.045,
+#     position = 1.05,
+#     cant_angle = 0,
+#     # sweep_length = 0.07,
+#     sweep_angle = 54.5,
+#     radius = 0.194/2,
+#     airfoil = ["xf-n0012-il-100000.csv", "degrees"],
+# )
 
 # Parachutes
 def drogue_trigger(p, h, y):
-    # p = pressure considering parachute noise signal
-    # h = height above ground level considering parachute noise signal
-    # y = [x, y, z, vx, vy, vz, e0, e1, e2, e3, w1, w2, w3]
-
     # activate drogue when vz < 0 m/s.
     return True if y[5] < 0 else False
 
 
 def main_trigger(p, h, y):
-    # p = pressure considering parachute noise signal
-    # h = height above ground level considering parachute noise signal
-    # y = [x, y, z, vx, vy, vz, e0, e1, e2, e3, w1, w2, w3]
-
     # activate main when vz < 0 m/s and z < 800 m
     return True if y[5] < 0 and h < 450 else False
 
@@ -180,7 +168,7 @@ Main = NimbusAscent.add_parachute(
     # cd_s = 2.2*np.pi*4.26**2 / 4,
     trigger = main_trigger,
     sampling_rate = 105,
-    lag = 1.5,
+    lag = 3.0,
     noise = (0, 8.3, 0.5),
 )
 
@@ -203,40 +191,8 @@ NimbusAscentFlight = Flight(rocket = NimbusAscent,
                     rail_length = 12,
                     inclination = 84, 
                     heading = 133,  
-                    terminate_on_apogee = True,
+                    terminate_on_apogee = False,
                     name = "Nimbus Ascent Trajectory",
                     )
 
 NimbusAscentFlight.all_info()
-
-#%% 
-# additional test plots
-# import copy 
-
-# def speed(mass):
-#     mock_rocket = copy.deepcopy(NimbusAscent)
-
-#     # Modify the mass
-#     mock_rocket.mass = mass
-#     mock_rocket.evaluate_dry_mass()
-#     mock_rocket.evaluate_total_mass()
-#     mock_rocket.evaluate_center_of_dry_mass()
-#     mock_rocket.evaluate_center_of_mass()
-#     mock_rocket.evaluate_reduced_mass()
-#     mock_rocket.evaluate_thrust_to_weight()
-#     mock_rocket.evaluate_static_margin()
-
-#     # Simulate Flight until Apogee
-#     test_flight = Flight(
-#         rocket = mock_rocket,
-#         environment = Env,
-#         rail_length = 12,
-#         inclination = 84,
-#         heading = 133,
-#         terminate_on_apogee = True,
-#     )
-#     return test_flight.out_of_rail_velocity
-
-
-# speedbymass = Function(speed, inputs="Mass (kg)", outputs="Out of Rail Speed (m/s)")
-# speedbymass.plot(47, 52, 20)
